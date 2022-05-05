@@ -7,12 +7,12 @@ namespace pet_hotel
 {
     public class PetOwner
     {
-        public int id { get; set; }
+        public int id { get; set;}
 
         [Required]
 
-        public string name { get; set; }
+        public string name { get; set;}
 
-        public string email { get; set; }
+        public string email { get; set;}
     }
 }
