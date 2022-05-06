@@ -15,17 +15,47 @@ namespace pet_hotel.Controllers
     public class PetsController : ControllerBase
     {
         private readonly ApplicationContext _context;
-        public PetsController(ApplicationContext context) {
+        public PetsController(ApplicationContext context)
+        {
             _context = context;
         }
 
         // This is just a stub for GET / to prevent any weird frontend errors that 
         // occur when the route is missing in this controller
+        // [HttpGet]
+        // public IEnumerable<Pet> GetPets() {
+        //     return new List<Pet>();
+        // }
+
         [HttpGet]
-        public IEnumerable<Pet> GetPets() {
-            return new List<Pet>();
+        public IEnumerable<Pet> GetAll()
+        {
+            return _context.Pets
+            .Include(pet => pet.ownedBy);
         }
 
+        [HttpGet("{id}")]
+        public ActionResult<Pet> GetById(int id)
+        {
+            Pet pet = _context.Pets.Include(pet => pet.ownedBy)
+            .SingleOrDefault(pet => pet.id == id);
+
+            if (pet == null)
+            {
+                return NotFound();
+            }
+
+            return pet;
+        }
+
+        [HttpPost]
+        public Pet Post(Pet pet)
+        {
+            _context.Add(pet);
+            _context.SaveChanges();
+
+            return pet;
+        }
         // [HttpGet]
         // [Route("test")]
         // public IEnumerable<Pet> GetPets() {
@@ -49,5 +79,61 @@ namespace pet_hotel.Controllers
 
         //     return new List<Pet>{ newPet1, newPet2};
         // }
+
+        [HttpPut("{id}")]
+        public Pet Put(int id, Pet pet)
+        {
+            pet.id = id;
+
+            _context.Update(pet);
+
+            _context.SaveChanges();
+
+            return pet;
+        }
+
+
+
+        [HttpDelete("{id}")]
+        public void Delete(int id)
+        {
+            Pet pet = _context.Pets.Find(id);
+
+            _context.Pets.Remove(pet);
+
+            _context.SaveChanges();
+        }
+
+
+        [HttpPut("{id}/checkin")]
+        public Pet Put(int id)
+        {
+            Pet pet = _context.Pets
+
+            .SingleOrDefault(pet => pet.id == id);
+
+            pet.CheckedInAt = DateTime.Now;
+            
+            _context.Update(pet);
+
+            _context.SaveChanges();
+
+            return pet;
+        }
+
+        [HttpPut("{id}/checkout")]
+        public Pet Update(int id)
+        {
+            Pet pet = _context.Pets
+            .SingleOrDefault(pet => pet.id == id);
+
+            pet.CheckedInAt = null;
+
+            _context.Update(pet);
+
+            _context.SaveChanges();
+
+            return pet;
+        }
     }
 }
